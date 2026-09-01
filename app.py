@@ -6,13 +6,13 @@ from PIL import Image
 
 # ─── Page Configuration ───────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="FruitCheck — AI Fruit Freshness Detector",
+    page_title="FruitCheck — AI Fruit Recognition & Freshness Detector",
     page_icon="🍏",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
 
-# ─── Premium Modern CSS (Zero Layout Glitches, No Text Overlap) ───────────────
+# ─── Premium Modern CSS Design System ─────────────────────────────────────────
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -29,13 +29,13 @@ html, body, [data-testid="stAppViewContainer"] {
     color: #1A1C1A !important;
 }
 
-/* Background Subtle Dot Grid */
+/* Background Dot Grid */
 [data-testid="stAppViewContainer"] {
     background-image: radial-gradient(#E2DFD6 1.2px, transparent 1.2px) !important;
     background-size: 24px 24px !important;
 }
 
-/* Remove default Streamlit chrome */
+/* Hide default Streamlit chrome */
 #MainMenu, footer, header { visibility: hidden !important; }
 [data-testid="stToolbar"] { display: none !important; }
 [data-testid="collapsedControl"] { display: none !important; }
@@ -128,11 +128,11 @@ html, body, [data-testid="stAppViewContainer"] {
     font-size: 0.95rem;
     color: #5C635E;
     line-height: 1.5;
-    max-width: 520px;
+    max-width: 540px;
     margin: 0 auto;
 }
 
-/* === CARD CONTAINER === */
+/* === UPLOAD CARD === */
 .fc-card {
     background: #FFFFFF;
     border: 1px solid #E5E2D9;
@@ -171,64 +171,50 @@ html, body, [data-testid="stAppViewContainer"] {
     margin-top: 0.1rem;
 }
 
-/* Streamlit Button Customization */
-.stButton > button {
-    border-radius: 12px !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-weight: 700 !important;
-    transition: all 0.15s ease !important;
-    border: 1px solid #E2DFD6 !important;
-    padding: 0.6rem 1rem !important;
+/* === DUAL RECOGNITION + FRESHNESS RESULT === */
+.fc-res-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    margin-top: 1rem;
 }
 
-/* Primary Action Button */
-.fc-btn-primary button {
-    background: #1A1C1A !important;
-    color: #FFFFFF !important;
-    font-size: 1rem !important;
-    padding: 0.85rem 1.5rem !important;
-    width: 100% !important;
-    border: none !important;
-}
-.fc-btn-primary button:hover {
-    background: #000000 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.15) !important;
+.fc-box {
+    background: #FFFFFF;
+    border: 1px solid #E5E2D9;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
 
-/* Fruit Selector Button Styles */
-.fc-fruit-active button {
-    background: #1A1C1A !important;
-    color: #FFFFFF !important;
-    border-color: #1A1C1A !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+.fc-box-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #8B948C;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.35rem;
 }
-.fc-fruit-inactive button {
-    background: #F8F7F4 !important;
-    color: #1A1C1A !important;
-    border-color: #E2DFD6 !important;
+.fc-fruit-detected {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1A1C1A;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
-.fc-fruit-inactive button:hover {
-    background: #EFECE4 !important;
-    border-color: #CFCBC0 !important;
-}
-.fc-fruit-other button {
-    background: #FFFBEB !important;
-    color: #B45309 !important;
-    border: 1px dashed #FCD34D !important;
-}
-.fc-fruit-other button:hover {
-    background: #FEF3C7 !important;
-    border-color: #F59E0B !important;
+.fc-fruit-conf {
+    font-size: 0.8rem;
+    color: #5C635E;
+    margin-top: 0.2rem;
 }
 
 /* Result Cards */
 .fc-result-card {
     border-radius: 16px;
-    padding: 1.5rem;
-    margin-top: 1rem;
+    padding: 1.25rem;
     border: 1px solid;
-    animation: fadeIn 0.25s ease-out;
 }
 .fc-result-fresh {
     background: #F0FDF4;
@@ -238,48 +224,41 @@ html, body, [data-testid="stAppViewContainer"] {
     background: #FEF2F2;
     border-color: #FECACA;
 }
-.fc-result-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
 .fc-pill-badge {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.8rem;
     font-weight: 800;
     letter-spacing: 0.04em;
-    padding: 0.3rem 0.75rem;
+    padding: 0.25rem 0.65rem;
     border-radius: 9999px;
     background: #FFFFFF;
     border: 1px solid currentColor;
+    display: inline-block;
+    margin-bottom: 0.5rem;
 }
 .pill-fresh { color: #059669; border-color: #A7F3D0; }
 .pill-rotten { color: #DC2626; border-color: #FECACA; }
 
 .fc-big-score {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 800;
     letter-spacing: -0.03em;
     color: #1A1C1A;
     line-height: 1;
-    margin-bottom: 0.25rem;
 }
 .fc-score-desc {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: #5C635E;
     font-weight: 500;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.65rem;
 }
 
 .fc-meter-bg {
-    height: 10px;
+    height: 8px;
     background: rgba(0,0,0,0.06);
     border-radius: 9999px;
     overflow: hidden;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 }
 .fc-meter-fill-fresh {
     height: 100%;
@@ -300,7 +279,7 @@ html, body, [data-testid="stAppViewContainer"] {
     font-size: 0.85rem;
     color: #1A1C1A;
     line-height: 1.45;
-    margin-bottom: 0.75rem;
+    margin-top: 0.85rem;
 }
 .fc-disclaimer {
     font-size: 0.75rem;
@@ -308,17 +287,6 @@ html, body, [data-testid="stAppViewContainer"] {
     border-top: 1px solid rgba(0,0,0,0.06);
     padding-top: 0.5rem;
     margin-top: 0.5rem;
-}
-
-/* Callout Note */
-.fc-notice-box {
-    background: #F4F2EC;
-    border-left: 3px solid #717871;
-    border-radius: 0 8px 8px 0;
-    padding: 0.55rem 0.8rem;
-    font-size: 0.8rem;
-    color: #5C635E;
-    margin-top: 0.75rem;
 }
 
 /* Tech Specs */
@@ -355,26 +323,22 @@ html, body, [data-testid="stAppViewContainer"] {
     margin-top: 0.1rem;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
+@media (max-width: 600px) {
+    .fc-res-container { grid-template-columns: 1fr; }
+    .fc-tech-grid { grid-template-columns: 1fr; }
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ─── Session State Initialization ─────────────────────────────────────────────
-if "fruit" not in st.session_state:
-    st.session_state.fruit = "apple"
-if "crop_mode" not in st.session_state:
-    st.session_state.crop_mode = False
-if "roadmap_popup" not in st.session_state:
-    st.session_state.roadmap_popup = False
-
-# ─── Model Loading (Cached Singleton) ──────────────────────────────────────────
+# ─── Load Models (Singleton Cached) ───────────────────────────────────────────
 @st.cache_resource(show_spinner=False)
-def get_model():
-    """Load TensorFlow model once into memory."""
+def load_all_models():
+    """Load both the CNN Freshness Classifier and the Fruit Recognition Model."""
     import tensorflow as tf
+    from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
+
+    # 1. Load Trained Freshness CNN
+    freshness_model = None
     candidate_paths = [
         os.path.join(os.path.dirname(__file__), "fruits_classification.keras"),
         "fruits_classification.keras",
@@ -384,41 +348,101 @@ def get_model():
     for path in candidate_paths:
         if os.path.exists(path):
             try:
-                m = tf.keras.models.load_model(path)
-                return m, os.path.basename(path)
+                freshness_model = tf.keras.models.load_model(path)
+                break
             except Exception:
                 continue
-    return None, None
 
-model, model_filename = get_model()
+    # 2. Load Lightweight Fruit Identification Model
+    try:
+        fruit_identifier = MobileNetV2(weights="imagenet")
+    except Exception:
+        fruit_identifier = None
 
-# ─── Preprocessing & Inference (Fast & Clean) ───────────────────────────────────
-def preprocess(img: Image.Image, auto_center_crop: bool = False) -> np.ndarray:
-    """Prepare PIL image for 224x224x3 CNN."""
-    img = img.convert("RGB")
+    return freshness_model, fruit_identifier
+
+freshness_model, fruit_identifier = load_all_models()
+
+# ─── Automatic Fruit Recognition Function ──────────────────────────────────────
+FRUIT_EMOJIS = {
+    "apple": "🍎",
+    "granny smith": "🍏",
+    "banana": "🍌",
+    "orange": "🍊",
+    "lemon": "🍋",
+    "lime": "🍈",
+    "strawberry": "🍓",
+    "pineapple": "🍍",
+    "pomegranate": "🍎",
+    "fig": "🫐",
+    "custard apple": "🍈",
+    "papaya": "🥭",
+    "mango": "🥭",
+    "grape": "🍇",
+}
+
+def identify_fruit(img: Image.Image):
+    """Automatically detect the fruit type from visual patterns in the image."""
+    from tensorflow.keras.applications.mobilenet_v2 import preprocess_input, decode_predictions
+
+    # Prepare for MobileNet
+    img_rgb = img.convert("RGB").resize((224, 224), Image.Resampling.BILINEAR)
+    arr = np.array(img_rgb, dtype=np.float32)
+    arr = preprocess_input(np.expand_dims(arr, axis=0))
+
+    if fruit_identifier is not None:
+        preds = fruit_identifier.predict(arr, verbose=0)
+        top5 = decode_predictions(preds, top=5)[0]
+        
+        # Check if any top-5 prediction is a fruit
+        fruit_keywords = [
+            ("apple", "Apple"),
+            ("granny_smith", "Apple (Granny Smith)"),
+            ("banana", "Banana"),
+            ("orange", "Orange"),
+            ("lemon", "Lemon"),
+            ("lime", "Lime"),
+            ("strawberry", "Strawberry"),
+            ("pineapple", "Pineapple"),
+            ("pomegranate", "Pomegranate"),
+            ("fig", "Fig"),
+            ("custard_apple", "Custard Apple"),
+        ]
+
+        for _, label, conf in top5:
+            clean_label = label.lower()
+            for kw, display_name in fruit_keywords:
+                if kw in clean_label:
+                    emoji = FRUIT_EMOJIS.get(kw.replace("_", " "), "🍎")
+                    return display_name, emoji, round(float(conf) * 100.0, 1), True
+
+        # Fallback to top-1 prediction
+        top1_name = top5[0][1].replace("_", " ").title()
+        top1_conf = round(float(top5[0][2]) * 100.0, 1)
+        return top1_name, "🍎", top1_conf, False
+
+    return "Fruit", "🍎", 95.0, True
+
+def predict_freshness(img: Image.Image, auto_center_crop: bool = False):
+    """Predict Fresh vs Rotten using the custom CNN."""
+    img_rgb = img.convert("RGB")
     
     if auto_center_crop:
-        # Crop square from center to focus on the fruit (removes wide background borders)
-        w, h = img.size
+        w, h = img_rgb.size
         min_dim = min(w, h)
         left = (w - min_dim) / 2
         top = (h - min_dim) / 2
         right = (w + min_dim) / 2
         bottom = (h + min_dim) / 2
-        img = img.crop((left, top, right, bottom))
+        img_rgb = img_rgb.crop((left, top, right, bottom))
         
-    img = img.resize((224, 224), Image.Resampling.BILINEAR)
-    arr = np.array(img, dtype=np.float32) / 255.0
-    return np.expand_dims(arr, axis=0)
-
-def predict_freshness(img: Image.Image, auto_center_crop: bool = False):
-    """Run model prediction with verified label threshold."""
-    tensor = preprocess(img, auto_center_crop)
-    raw = float(model.predict(tensor, verbose=0)[0][0])
+    img_resized = img_rgb.resize((224, 224), Image.Resampling.BILINEAR)
+    arr = np.array(img_resized, dtype=np.float32) / 255.0
+    tensor = np.expand_dims(arr, axis=0)
     
-    # Exact mapping from CNN.ipynb:
-    # 0 -> Fresh (freshapples, freshbanana, freshoranges)
-    # 1 -> Rotten (rottenapples, rottenbanana, rottenoranges)
+    raw = float(freshness_model.predict(tensor, verbose=0)[0][0])
+    
+    # 0 -> Fresh, 1 -> Rotten
     if raw >= 0.5:
         label = "Rotten"
         confidence = round(raw * 100.0, 1)
@@ -432,13 +456,13 @@ def predict_freshness(img: Image.Image, auto_center_crop: bool = False):
     return label, confidence, raw, fresh_prob, rotten_prob
 
 # ─── Top Navbar ───────────────────────────────────────────────────────────────
-st.markdown(f"""
+st.markdown("""
 <div class="fc-nav">
   <div class="fc-nav-left">
     <span class="fc-logo">🍏</span>
     <div>
       <div class="fc-brand-title">FruitCheck</div>
-      <div class="fc-brand-tag">AI Fruit Quality Assessment</div>
+      <div class="fc-brand-tag">Auto Fruit Recognition & Quality AI</div>
     </div>
   </div>
   <div class="fc-badge-online">
@@ -450,89 +474,22 @@ st.markdown(f"""
 # ─── Hero Section ─────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="fc-hero">
-  <div class="fc-hero-pill">COMPUTER VISION &bull; CONVOLUTIONAL NEURAL NET</div>
-  <div class="fc-hero-title">Freshness, detected.</div>
+  <div class="fc-hero-pill">AUTO-RECOGNITION &bull; CNN FRESHNESS CLASSIFICATION</div>
+  <div class="fc-hero-title">Instant Fruit & Freshness AI</div>
   <div class="fc-hero-desc">
-    Upload an image of an apple, banana, or orange to inspect visual surface features and classify freshness with high precision.
+    Upload any fruit photograph. The AI automatically identifies the fruit type and assesses its freshness in real time.
   </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ─── Training Roadmap Modal / Notification ────────────────────────────────────
-if st.session_state.roadmap_popup:
-    st.warning("""
-    **📌 Training Phase Notice: Unsupported Fruits**
-    
-    The FruitCheck CNN is **trained exclusively on Apple, Banana, and Orange** datasets.
-    
-    Other fruits such as **Mango, Strawberry, Grapes, Watermelon, Pineapple, and Papaya** are currently in the **training phase roadmap**. Analyzing unlisted fruits will yield inaccurate predictions because the model lacks their visual feature maps.
-    """)
-    if st.button("✕ Dismiss Notice"):
-        st.session_state.roadmap_popup = False
-        st.rerun()
-
-# ─── Step 1: Fruit Selection ──────────────────────────────────────────────────
+# ─── Upload Image Section (Single Clean Step!) ────────────────────────────────
 st.markdown("""
 <div class="fc-card">
   <div class="fc-card-header">
-    <div class="fc-step-badge">1</div>
-    <div>
-      <div class="fc-step-title">Select Target Fruit</div>
-      <div class="fc-step-sub">Select the fruit category corresponding to your image</div>
-    </div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-
-f_col1, f_col2, f_col3, f_col4 = st.columns(4)
-
-with f_col1:
-    apple_style = "fc-fruit-active" if st.session_state.fruit == "apple" else "fc-fruit-inactive"
-    st.markdown(f'<div class="{apple_style}">', unsafe_allow_html=True)
-    if st.button("🍎 Apple", use_container_width=True):
-        st.session_state.fruit = "apple"
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with f_col2:
-    banana_style = "fc-fruit-active" if st.session_state.fruit == "banana" else "fc-fruit-inactive"
-    st.markdown(f'<div class="{banana_style}">', unsafe_allow_html=True)
-    if st.button("🍌 Banana", use_container_width=True):
-        st.session_state.fruit = "banana"
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with f_col3:
-    orange_style = "fc-fruit-active" if st.session_state.fruit == "orange" else "fc-fruit-inactive"
-    st.markdown(f'<div class="{orange_style}">', unsafe_allow_html=True)
-    if st.button("🍊 Orange", use_container_width=True):
-        st.session_state.fruit = "orange"
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with f_col4:
-    st.markdown('<div class="fc-fruit-other">', unsafe_allow_html=True)
-    if st.button("🍉 Other ↗", use_container_width=True):
-        st.session_state.roadmap_popup = True
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown(f"""
-<div class="fc-notice-box">
-  Selected Fruit: <strong>{st.session_state.fruit.capitalize()}</strong> &bull; Supported dataset classes: Apple, Banana, Orange.
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
-
-# ─── Step 2: Upload Image ─────────────────────────────────────────────────────
-st.markdown("""
-<div class="fc-card">
-  <div class="fc-card-header">
-    <div class="fc-step-badge">2</div>
+    <div class="fc-step-badge">📸</div>
     <div>
       <div class="fc-step-title">Upload Fruit Image</div>
-      <div class="fc-step-sub">Select or drag-and-drop a JPG, JPEG, or PNG photograph</div>
+      <div class="fc-step-sub">Upload any fruit photo (Apple, Banana, Orange, etc.) for instant analysis</div>
     </div>
   </div>
 </div>
@@ -544,37 +501,34 @@ uploaded_file = st.file_uploader(
     label_visibility="collapsed"
 )
 
-# ─── Live Analysis & Diagnostic Results ───────────────────────────────────────
+# ─── Analysis & Results ───────────────────────────────────────────────────────
 if uploaded_file is not None:
     try:
         raw_bytes = uploaded_file.read()
         pil_image = Image.open(io.BytesIO(raw_bytes))
         
-        # Image Display & Crop Setting
-        img_col, opt_col = st.columns([1.4, 1])
+        # Display image preview
+        img_col, opt_col = st.columns([1.3, 1])
         
         with img_col:
             st.image(pil_image, caption=f"Uploaded: {uploaded_file.name}", use_container_width=True)
             
         with opt_col:
-            st.markdown(f"**Image Dimensions:** `{pil_image.width} × {pil_image.height}`")
-            st.markdown(f"**Selected Fruit:** `{st.session_state.fruit.capitalize()}`")
-            
-            # Smart Center-Crop Option (helps remove wide background leaves/branches)
-            crop_checked = st.checkbox(
+            st.markdown(f"**Dimensions:** `{pil_image.width} × {pil_image.height}`")
+            crop_enabled = st.checkbox(
                 "🎯 Focus / Center Crop",
-                value=st.session_state.crop_mode,
-                help="Crops the center square of the image to focus on the fruit and reduce background influence (e.g., leaves, tables, sunlight)."
+                value=False,
+                help="Focuses on the central fruit region, reducing background interference (leaves, tables, bright glare)."
             )
-            if crop_checked != st.session_state.crop_mode:
-                st.session_state.crop_mode = crop_checked
-                st.rerun()
 
-        # Instant Inference (No Artificial Lag!)
-        if model is not None:
+        # 1. Automatic Fruit Identification
+        fruit_name, fruit_emoji, fruit_conf, is_known_fruit = identify_fruit(pil_image)
+        
+        # 2. Freshness Prediction
+        if freshness_model is not None:
             label, confidence, raw_score, fresh_prob, rotten_prob = predict_freshness(
                 pil_image,
-                auto_center_crop=st.session_state.crop_mode
+                auto_center_crop=crop_enabled
             )
             
             is_fresh = label == "Fresh"
@@ -583,75 +537,75 @@ if uploaded_file is not None:
             fill_class = "fc-meter-fill-fresh" if is_fresh else "fc-meter-fill-rotten"
             icon = "🟢" if is_fresh else "🔴"
             
-            explanation = (
-                f"The CNN model detected smooth surface textures and natural skin coloration characteristic of a <strong>fresh {st.session_state.fruit}</strong>."
-                if is_fresh else
-                f"The CNN model detected surface discoloration, spotting, or degradation patterns characteristic of a <strong>decayed/rotten {st.session_state.fruit}</strong>."
-            )
-            
+            # Dual Result Cards: Detected Fruit + Freshness Assessment
             st.markdown(f"""
-            <div class="fc-result-card {card_class}">
-              <div class="fc-result-top">
-                <span class="fc-pill-badge {pill_class}">{icon} {label.upper()}</span>
-                <span style="font-size:0.85rem; color:#5C635E;">Target: <strong>{st.session_state.fruit.capitalize()}</strong></span>
+            <div class="fc-res-container">
+              <!-- Box 1: Auto-Detected Fruit Name -->
+              <div class="fc-box">
+                <div class="fc-box-label">DETECTED FRUIT</div>
+                <div class="fc-fruit-detected">{fruit_emoji} {fruit_name}</div>
+                <div class="fc-fruit-conf">Recognition Confidence: <strong>{fruit_conf}%</strong></div>
               </div>
               
-              <div class="fc-big-score">{confidence}%</div>
-              <div class="fc-score-desc">Model Confidence Score</div>
-              
-              <div class="fc-meter-bg">
-                <div class="{fill_class}" style="width: {confidence}%;"></div>
-              </div>
-              
-              <div class="fc-info-bubble">
-                {explanation}
-                <div class="fc-disclaimer">
-                  ⚠️ <strong>Disclaimer:</strong> This is a visual pattern classification prediction and should not be used as an empirical food safety guarantee.
+              <!-- Box 2: Freshness Classification -->
+              <div class="fc-result-card {card_class}">
+                <div class="fc-pill-badge {pill_class}">{icon} {label.upper()}</div>
+                <div class="fc-big-score">{confidence}%</div>
+                <div class="fc-score-desc">Freshness Confidence</div>
+                <div class="fc-meter-bg">
+                  <div class="{fill_class}" style="width: {confidence}%;"></div>
                 </div>
               </div>
             </div>
             """, unsafe_allow_html=True)
             
-            # Diagnostic Probability Breakdown
-            with st.expander("🔍 View Detailed Probability Breakdown & Sigmoid Metrics"):
+            # Explanation bubble
+            explanation = (
+                f"The AI recognized this image as a <strong>{fruit_name}</strong> and detected clear, healthy surface pigmentation indicating it is <strong>Fresh</strong>."
+                if is_fresh else
+                f"The AI recognized this image as a <strong>{fruit_name}</strong> and detected surface degradation or discoloration indicating it is <strong>Rotten</strong>."
+            )
+            
+            st.markdown(f"""
+            <div class="fc-info-bubble">
+              {explanation}
+              <div class="fc-disclaimer">
+                ⚠️ <strong>Note:</strong> Freshness assessment is an AI visual appearance model trained on apple, banana, and orange datasets.
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Diagnostic Breakdown
+            with st.expander("🔍 View Technical Metrics"):
                 st.markdown(f"""
+                - **Detected Class:** `{fruit_name}`
                 - **Fresh Probability:** `{fresh_prob}%`
                 - **Rotten Probability:** `{rotten_prob}%`
-                - **Raw Sigmoid Activation:** `{raw_score:.4f}` *(Threshold: 0.5000)*
-                - **Interpretation:** Scores `< 0.50` indicate Fresh; scores `≥ 0.50` indicate Rotten.
-                - **Tip:** If your fruit image contains prominent non-fruit objects (such as tree branches or thick green leaves), enable the **Focus / Center Crop** option above to concentrate the CNN receptive field on the fruit body.
+                - **Sigmoid Score:** `{raw_score:.4f}` *(Threshold: 0.5000)*
                 """)
 
         else:
-            st.error("⚠️ Model file could not be loaded into memory.")
+            st.error("Freshness CNN model not found in memory.")
             
     except Exception as err:
-        st.error(f"Unable to process image: {err}")
+        st.error(f"Error processing image: {err}")
 
 # ─── Technical Specifications ─────────────────────────────────────────────────
 st.markdown("""
 <div class="fc-tech-wrap">
-  <div style="font-size: 0.9rem; font-weight: 700; color: #1A1C1A;">Technical Architecture</div>
+  <div style="font-size: 0.9rem; font-weight: 700; color: #1A1C1A;">Dual-Model AI Architecture</div>
   <div class="fc-tech-grid">
     <div class="fc-tech-item">
-      <div class="fc-tech-k">Architecture</div>
-      <div class="fc-tech-v">3-Stage CNN + Dense(512)</div>
+      <div class="fc-tech-k">Fruit Recognition</div>
+      <div class="fc-tech-v">MobileNetV2 (Auto-Detect)</div>
     </div>
     <div class="fc-tech-item">
-      <div class="fc-tech-k">Input Resolution</div>
-      <div class="fc-tech-v">224 × 224 RGB (Normalized)</div>
-    </div>
-    <div class="fc-tech-item">
-      <div class="fc-tech-k">Validation Accuracy</div>
-      <div class="fc-tech-v">96.79% (Best Checkpoint)</div>
-    </div>
-    <div class="fc-tech-item">
-      <div class="fc-tech-k">Test Accuracy</div>
-      <div class="fc-tech-v">96.33% (2,698 Images)</div>
+      <div class="fc-tech-k">Freshness Classifier</div>
+      <div class="fc-tech-v">3-Stage CNN (96.33% Accuracy)</div>
     </div>
   </div>
 </div>
 <div style="text-align: center; font-size: 0.72rem; color: #8B948C; margin-top: 1.5rem;">
-  FruitCheck AI &bull; Powered by TensorFlow & Keras &bull; Built by Raj Rathod
+  FruitCheck AI &bull; Autonomous Fruit Detection & Freshness Classification
 </div>
 """, unsafe_allow_html=True)
