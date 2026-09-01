@@ -132,7 +132,7 @@ html, body, [data-testid="stAppViewContainer"] {
     margin: 0 auto;
 }
 
-/* === UPLOAD CARD === */
+/* === LARGE PROMINENT UPLOAD CARD & DROPZONE === */
 .fc-card {
     background: #FFFFFF;
     border: 1px solid #E5E2D9;
@@ -148,27 +148,69 @@ html, body, [data-testid="stAppViewContainer"] {
     margin-bottom: 1rem;
 }
 .fc-step-badge {
-    width: 1.6rem;
-    height: 1.6rem;
+    width: 1.8rem;
+    height: 1.8rem;
     border-radius: 50%;
     background: #1A1C1A;
     color: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 700;
     flex-shrink: 0;
 }
 .fc-step-title {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: #1A1C1A;
 }
 .fc-step-sub {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: #717871;
-    margin-top: 0.1rem;
+    margin-top: 0.15rem;
+}
+
+/* === EXPANDED LARGE FILE UPLOADER === */
+[data-testid="stFileUploader"] {
+    width: 100% !important;
+}
+[data-testid="stFileUploader"] section {
+    min-height: 240px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: #FAF9F6 !important;
+    border: 2.5px dashed #D2CEC2 !important;
+    border-radius: 20px !important;
+    padding: 3.5rem 2rem !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+    text-align: center !important;
+}
+[data-testid="stFileUploader"] section:hover {
+    border-color: #1A1C1A !important;
+    background: #F3F1E8 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05) !important;
+}
+[data-testid="stFileUploader"] section svg {
+    width: 44px !important;
+    height: 44px !important;
+    color: #1A1C1A !important;
+    margin-bottom: 0.4rem !important;
+}
+[data-testid="stFileUploader"] section span {
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    color: #1A1C1A !important;
+}
+[data-testid="stFileUploader"] section small {
+    font-size: 0.82rem !important;
+    color: #717871 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    margin-top: 0.25rem !important;
 }
 
 /* === DUAL RECOGNITION + FRESHNESS RESULT === */
