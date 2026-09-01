@@ -6,7 +6,7 @@ from PIL import Image
 
 # ─── Page Configuration ───────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="FruitCheck — AI Fruit Recognition & Freshness Detector",
+    page_title="FruitCheck — AI Fruit Freshness & Recognition System",
     page_icon="🍏",
     layout="centered",
     initial_sidebar_state="collapsed",
@@ -29,7 +29,7 @@ html, body, [data-testid="stAppViewContainer"] {
     color: #1A1C1A !important;
 }
 
-/* Background Dot Grid */
+/* Background Subtle Dot Grid */
 [data-testid="stAppViewContainer"] {
     background-image: radial-gradient(#E2DFD6 1.2px, transparent 1.2px) !important;
     background-size: 24px 24px !important;
@@ -132,7 +132,7 @@ html, body, [data-testid="stAppViewContainer"] {
     margin: 0 auto;
 }
 
-/* === LARGE PROMINENT UPLOAD CARD & DROPZONE === */
+/* === LARGE EXPANDED UPLOAD DROPZONE === */
 .fc-card {
     background: #FFFFFF;
     border: 1px solid #E5E2D9;
@@ -171,12 +171,11 @@ html, body, [data-testid="stAppViewContainer"] {
     margin-top: 0.15rem;
 }
 
-/* === EXPANDED LARGE FILE UPLOADER === */
 [data-testid="stFileUploader"] {
     width: 100% !important;
 }
 [data-testid="stFileUploader"] section {
-    min-height: 240px !important;
+    min-height: 230px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
@@ -184,7 +183,7 @@ html, body, [data-testid="stAppViewContainer"] {
     background: #FAF9F6 !important;
     border: 2.5px dashed #D2CEC2 !important;
     border-radius: 20px !important;
-    padding: 3.5rem 2rem !important;
+    padding: 3rem 2rem !important;
     transition: all 0.2s ease-in-out !important;
     cursor: pointer !important;
     text-align: center !important;
@@ -239,7 +238,7 @@ html, body, [data-testid="stAppViewContainer"] {
     margin-bottom: 0.35rem;
 }
 .fc-fruit-detected {
-    font-size: 1.5rem;
+    font-size: 1.45rem;
     font-weight: 800;
     color: #1A1C1A;
     display: flex;
@@ -249,7 +248,7 @@ html, body, [data-testid="stAppViewContainer"] {
 .fc-fruit-conf {
     font-size: 0.8rem;
     color: #5C635E;
-    margin-top: 0.2rem;
+    margin-top: 0.25rem;
 }
 
 /* Result Cards */
@@ -331,6 +330,14 @@ html, body, [data-testid="stAppViewContainer"] {
     margin-top: 0.5rem;
 }
 
+/* Quick Override Switcher */
+.fc-override-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
 /* Tech Specs */
 .fc-tech-wrap {
     background: #FFFFFF;
@@ -372,14 +379,17 @@ html, body, [data-testid="stAppViewContainer"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ─── Load Models (Singleton Cached) ───────────────────────────────────────────
+# ─── Session State ────────────────────────────────────────────────────────────
+if "manual_fruit_override" not in st.session_state:
+    st.session_state.manual_fruit_override = None
+
+# ─── Load Models ──────────────────────────────────────────────────────────────
 @st.cache_resource(show_spinner=False)
 def load_all_models():
     """Load both the CNN Freshness Classifier and the Fruit Recognition Model."""
     import tensorflow as tf
     from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
 
-    # 1. Load Trained Freshness CNN
     freshness_model = None
     candidate_paths = [
         os.path.join(os.path.dirname(__file__), "fruits_classification.keras"),
@@ -395,7 +405,6 @@ def load_all_models():
             except Exception:
                 continue
 
-    # 2. Load Lightweight Fruit Identification Model
     try:
         fruit_identifier = MobileNetV2(weights="imagenet")
     except Exception:
@@ -405,11 +414,11 @@ def load_all_models():
 
 freshness_model, fruit_identifier = load_all_models()
 
-# ─── Automatic Fruit Recognition & Produce Validation ─────────────────────────
-VALID_FRUITS = {
-    "apple": ("Apple", "🍎"),
-    "granny_smith": ("Apple (Granny Smith)", "🍏"),
+# ─── Intelligent Validation & Recognition Engine ──────────────────────────────
+DIRECT_FRUITS = {
     "banana": ("Banana", "🍌"),
+    "apple": ("Apple", "🍎"),
+    "granny_smith": ("Apple", "🍏"),
     "orange": ("Orange", "🍊"),
     "lemon": ("Lemon", "🍋"),
     "lime": ("Lime", "🍈"),
@@ -424,8 +433,6 @@ VALID_FRUITS = {
     "grape": ("Grapes", "🍇"),
     "watermelon": ("Watermelon", "🍉"),
     "cantaloupe": ("Melon", "🍈"),
-    "acorn_squash": ("Squash / Fruit", "🍈"),
-    "butternut_squash": ("Squash / Fruit", "🍈"),
     "cucumber": ("Cucumber", "🥒"),
     "bell_pepper": ("Bell Pepper", "🫑"),
     "zucchini": ("Zucchini", "🥒"),
@@ -433,10 +440,35 @@ VALID_FRUITS = {
     "avocado": ("Avocado", "🥑"),
 }
 
-def identify_fruit(img: Image.Image):
+# ImageNet shape-proxies for rotten/decayed/blackened fruits:
+ROTTEN_SHAPE_PROXIES = {
+    "hook": ("Banana (Decayed)", "🍌"),
+    "slug": ("Banana (Decayed)", "🍌"),
+    "snail": ("Banana (Decayed)", "🍌"),
+    "spindle": ("Banana (Decayed)", "🍌"),
+    "wooden_spoon": ("Banana (Decayed)", "🍌"),
+    "mushroom": ("Fruit (Decayed)", "🍎"),
+    "acorn": ("Apple (Decayed)", "🍎"),
+    "sponge": ("Orange (Decayed)", "🍊"),
+    "rock": ("Fruit (Decayed)", "🍎"),
+    "stone": ("Fruit (Decayed)", "🍎"),
+    "dough": ("Fruit (Decayed)", "🍊"),
+    "potato": ("Fruit (Decayed)", "🍎"),
+}
+
+# Explicit non-fruit categories that should be blocked:
+EXPLICIT_NON_FRUITS = [
+    "jean", "suit", "jersey", "t-shirt", "shirt", "dress", "sunglasses", "person", "groom",
+    "lab_coat", "cardigan", "sweatshirt", "car", "truck", "airplane", "boat", "motorcycle",
+    "laptop", "cellphone", "monitor", "keyboard", "desk", "sofa", "chair", "bed",
+    "dog", "cat", "horse", "bird", "fish", "clock", "watch", "shoe", "boot"
+]
+
+def analyze_image_contents(img: Image.Image):
     """
-    Validates if the image contains a fruit and identifies the fruit type.
-    Returns: (is_fruit, display_name, emoji, confidence_pct, detected_class_raw)
+    Intelligently determines whether the image contains a fruit (fresh or rotten)
+    or an invalid non-fruit object.
+    Returns: (is_valid, fruit_display, emoji, confidence, detected_raw)
     """
     from tensorflow.keras.applications.mobilenet_v2 import preprocess_input, decode_predictions
 
@@ -448,26 +480,31 @@ def identify_fruit(img: Image.Image):
         preds = fruit_identifier.predict(arr, verbose=0)
         top5 = decode_predictions(preds, top=5)[0]
         
-        # 1. Check if top-1 is directly a known fruit
-        top1_id, top1_name, top1_conf = top5[0]
-        top1_clean = top1_name.lower().replace(" ", "_")
-        
-        for k, (name, emoji) in VALID_FRUITS.items():
-            if k in top1_clean:
-                return True, name, emoji, round(float(top1_conf) * 100.0, 1), top1_name.replace("_", " ").title()
+        top1_name = top5[0][1].lower().replace(" ", "_")
+        top1_conf = round(float(top5[0][2]) * 100.0, 1)
+        top1_display = top5[0][1].replace("_", " ").title()
 
-        # 2. Check if any top-3 prediction contains a prominent fruit with significant confidence
-        for _, label, conf in top5[:3]:
-            label_clean = label.lower().replace(" ", "_")
-            for k, (name, emoji) in VALID_FRUITS.items():
-                if k in label_clean and float(conf) >= 0.15:
+        # 1. Check for explicit non-fruit items (e.g. human clothing, vehicles, electronics)
+        for non_item in EXPLICIT_NON_FRUITS:
+            if non_item in top1_name:
+                return False, top1_display, "🚫", top1_conf, top1_display
+
+        # 2. Check for direct fruit matches in top-5
+        for _, label, conf in top5:
+            clean_label = label.lower().replace(" ", "_")
+            for k, (name, emoji) in DIRECT_FRUITS.items():
+                if k in clean_label:
                     return True, name, emoji, round(float(conf) * 100.0, 1), label.replace("_", " ").title()
 
-        # If not a fruit, return top-1 non-fruit detected class
-        non_fruit_name = top1_name.replace("_", " ").title()
-        return False, non_fruit_name, "🚫", round(float(top1_conf) * 100.0, 1), non_fruit_name
+        # 3. Check for rotten/decayed fruit shape proxies
+        for k, (name, emoji) in ROTTEN_SHAPE_PROXIES.items():
+            if k in top1_name:
+                return True, name, emoji, top1_conf, top1_display
 
-    return True, "Fruit", "🍎", 90.0, "Fruit"
+        # 4. If top-1 is not on the explicit non-fruit list, treat as general fruit object
+        return True, "Fruit", "🍎", top1_conf, top1_display
+
+    return True, "Fruit", "🍎", 95.0, "Fruit"
 
 def predict_freshness(img: Image.Image, auto_center_crop: bool = False):
     """Predict Fresh vs Rotten using the custom CNN."""
@@ -528,7 +565,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─── Upload Image Section ─────────────────────────────────────────────────────
+# ─── Large Prominent Upload Section ───────────────────────────────────────────
 st.markdown("""
 <div class="fc-card">
   <div class="fc-card-header">
@@ -568,7 +605,7 @@ if uploaded_file is not None:
             )
 
         # 1. Validation & Automatic Fruit Identification
-        is_fruit, fruit_name, fruit_emoji, fruit_conf, raw_detected = identify_fruit(pil_image)
+        is_fruit, auto_name, auto_emoji, auto_conf, raw_detected = analyze_image_contents(pil_image)
         
         # ─── VALIDATION CHECK: Non-Fruit Image Detected ───────────────────────
         if not is_fruit:
@@ -576,10 +613,10 @@ if uploaded_file is not None:
             <div style="background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 16px; padding: 1.5rem; margin-top: 1rem;">
               <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem;">
                 <span style="font-size: 1.6rem;">🚫</span>
-                <span style="font-size: 1.15rem; font-weight: 800; color: #991B1B;">Validation Error: Non-Fruit Image Detected</span>
+                <span style="font-size: 1.15rem; font-weight: 800; color: #991B1B;">Validation Notice: Non-Fruit Image Detected</span>
               </div>
               <p style="font-size: 0.92rem; color: #7F1D1D; line-height: 1.5; margin-bottom: 0.75rem;">
-                The AI detected <strong>'{raw_detected}'</strong> (Confidence: {fruit_conf}%) in the uploaded image.
+                The AI detected <strong>'{raw_detected}'</strong> (Confidence: {auto_conf}%) in the uploaded image.
                 This does not appear to be a fruit or produce item.
               </p>
               <div style="background: #FFFFFF; border: 1px solid #FEE2E2; border-radius: 10px; padding: 0.85rem; font-size: 0.85rem; color: #991B1B;">
@@ -590,7 +627,11 @@ if uploaded_file is not None:
             """, unsafe_allow_html=True)
             
         else:
-            # 2. Freshness Prediction (Only runs for validated fruits!)
+            # Determine active fruit name (auto-detected or manually switched)
+            active_fruit_name = st.session_state.manual_fruit_override if st.session_state.manual_fruit_override else auto_name
+            active_emoji = "🍌" if "Banana" in active_fruit_name else ("🍊" if "Orange" in active_fruit_name else "🍎")
+
+            # 2. Freshness Prediction (Runs for all validated fruits!)
             if freshness_model is not None:
                 label, confidence, raw_score, fresh_prob, rotten_prob = predict_freshness(
                     pil_image,
@@ -609,8 +650,8 @@ if uploaded_file is not None:
                   <!-- Box 1: Auto-Detected Fruit Name -->
                   <div class="fc-box">
                     <div class="fc-box-label">DETECTED FRUIT</div>
-                    <div class="fc-fruit-detected">{fruit_emoji} {fruit_name}</div>
-                    <div class="fc-fruit-conf">Recognition Confidence: <strong>{fruit_conf}%</strong></div>
+                    <div class="fc-fruit-detected">{active_emoji} {active_fruit_name}</div>
+                    <div class="fc-fruit-conf">Recognition: <strong>{auto_conf}%</strong> &bull; Auto-Identified</div>
                   </div>
                   
                   <!-- Box 2: Freshness Classification -->
@@ -627,9 +668,9 @@ if uploaded_file is not None:
                 
                 # Explanation bubble
                 explanation = (
-                    f"The AI recognized this image as a <strong>{fruit_name}</strong> and detected clear, healthy surface pigmentation indicating it is <strong>Fresh</strong>."
+                    f"The AI recognized this image as <strong>{active_fruit_name}</strong> and detected clear, healthy surface pigmentation indicating it is <strong>Fresh</strong>."
                     if is_fresh else
-                    f"The AI recognized this image as a <strong>{fruit_name}</strong> and detected surface degradation or discoloration indicating it is <strong>Rotten</strong>."
+                    f"The AI recognized this image as <strong>{active_fruit_name}</strong> and detected surface degradation or discoloration indicating it is <strong>Rotten</strong>."
                 )
                 
                 st.markdown(f"""
@@ -642,13 +683,32 @@ if uploaded_file is not None:
                 """, unsafe_allow_html=True)
                 
                 # Diagnostic Breakdown
-                with st.expander("🔍 View Technical Metrics"):
+                with st.expander("🔍 View Technical Metrics & Fruit Override"):
                     st.markdown(f"""
-                    - **Detected Class:** `{fruit_name}`
+                    - **Detected Class:** `{active_fruit_name}` *(Raw: {raw_detected})*
                     - **Fresh Probability:** `{fresh_prob}%`
                     - **Rotten Probability:** `{rotten_prob}%`
                     - **Sigmoid Score:** `{raw_score:.4f}` *(Threshold: 0.5000)*
                     """)
+                    
+                    st.markdown("**Switch Target Fruit (Optional):**")
+                    sw1, sw2, sw3, sw4 = st.columns(4)
+                    with sw1:
+                        if st.button("🍎 Apple"):
+                            st.session_state.manual_fruit_override = "Apple"
+                            st.rerun()
+                    with sw2:
+                        if st.button("🍌 Banana"):
+                            st.session_state.manual_fruit_override = "Banana"
+                            st.rerun()
+                    with sw3:
+                        if st.button("🍊 Orange"):
+                            st.session_state.manual_fruit_override = "Orange"
+                            st.rerun()
+                    with sw4:
+                        if st.button("🤖 Reset Auto"):
+                            st.session_state.manual_fruit_override = None
+                            st.rerun()
 
             else:
                 st.error("Freshness CNN model not found in memory.")
