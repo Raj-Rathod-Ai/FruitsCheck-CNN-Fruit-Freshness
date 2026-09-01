@@ -497,7 +497,12 @@ def load_all_models():
     if freshness_model is None:
         try:
             from huggingface_hub import hf_hub_download
-            repo_id = os.getenv("HF_MODEL_REPO", "Raj1908/fruitcheck-model")
+            repo_id = "Raj1908/fruitcheck-model"
+            if hasattr(st, "secrets") and "HF_MODEL_REPO" in st.secrets:
+                repo_id = st.secrets["HF_MODEL_REPO"]
+            elif os.getenv("HF_MODEL_REPO"):
+                repo_id = os.getenv("HF_MODEL_REPO")
+                
             downloaded = hf_hub_download(repo_id=repo_id, filename="fruits_classification.keras")
             freshness_model = tf.keras.models.load_model(downloaded)
         except Exception:
@@ -832,11 +837,12 @@ if uploaded_file is not None:
 
             else:
                 st.markdown("""
-                <div style="background: #FFFBEB; border: 1.5px solid #FCD34D; border-radius: 14px; padding: 1.25rem; margin-top: 1rem;">
-                  <div style="font-weight: 700; color: #92400E; margin-bottom: 0.35rem;">📦 Model Download Required on Cloud</div>
+                <div style="background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 14px; padding: 1.25rem; margin-top: 1rem;">
+                  <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #92400E; margin-bottom: 0.35rem;">
+                    <span>⏳</span> AI Model Initializing
+                  </div>
                   <div style="font-size: 0.85rem; color: #B45309; line-height: 1.45;">
-                    The 508MB model weights are stored on Hugging Face Model Hub.
-                    To enable online inference, set <code>HF_MODEL_REPO = "Raj1908/fruitcheck-model"</code> in your Streamlit Cloud app secrets.
+                    The neural network weights are currently loading into memory. Please wait a moment or refresh the page.
                   </div>
                 </div>
                 """, unsafe_allow_html=True)
