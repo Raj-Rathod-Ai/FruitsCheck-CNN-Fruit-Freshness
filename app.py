@@ -596,65 +596,12 @@ def load_all_models():
 
 freshness_model, fruit_identifier = load_all_models()
 
-# ─── Intelligent Validation & Recognition Engine ──────────────────────────────
-DIRECT_FRUITS = {
-    # Apples (Red Delicious, Gala, Granny Smith, and shape/color proxies)
-    "apple": ("Apple", "🍎"),
-    "granny_smith": ("Apple", "🍏"),
-    "pomegranate": ("Apple", "🍎"),
-    "custard_apple": ("Apple", "🍏"),
-    "crab_apple": ("Apple", "🍎"),
-    "wood_apple": ("Apple", "🍏"),
-    "quince": ("Apple", "🍎"),
-    "rose_hip": ("Apple", "🍎"),
-    "plum": ("Apple", "🍎"),
-    "nectarine": ("Apple", "🍎"),
-    
-    # Bananas
-    "banana": ("Banana", "🍌"),
-    "plantain": ("Banana", "🍌"),
-    
-    # Oranges & Citrus
-    "orange": ("Orange", "🍊"),
-    "lemon": ("Orange / Lemon", "🍋"),
-    "lime": ("Orange / Lime", "🍈"),
-    "tangerine": ("Orange", "🍊"),
-    "mandarin": ("Orange", "🍊"),
-    "grapefruit": ("Orange", "🍊"),
-    "citrus": ("Orange", "🍊"),
-    
-    # Other Common Produce
-    "strawberry": ("Strawberry", "🍓"),
-    "pineapple": ("Pineapple", "🍍"),
-    "papaya": ("Papaya", "🥭"),
-    "mango": ("Mango", "🥭"),
-    "grape": ("Grapes", "🍇"),
-    "watermelon": ("Watermelon", "🍉"),
-    "cantaloupe": ("Melon", "🍈"),
-    "cucumber": ("Cucumber", "🥒"),
-    "bell_pepper": ("Bell Pepper", "🫑"),
-    "zucchini": ("Zucchini", "🥒"),
-    "peach": ("Peach", "🍑"),
-    "avocado": ("Avocado", "🥑"),
-}
+# ─── Intelligent Validation & Core Fruit Recognition Engine ───────────────────
+CORE_APPLES = ["apple", "granny_smith", "pomegranate", "crab_apple"]
+CORE_BANANAS = ["banana", "plantain", "hook", "slug", "spindle"]
+CORE_ORANGES = ["orange", "tangerine", "mandarin", "citrus", "grapefruit"]
 
-# ImageNet shape-proxies for rotten/decayed/blackened fruits:
-ROTTEN_SHAPE_PROXIES = {
-    "hook": ("Banana (Decayed)", "🍌"),
-    "slug": ("Banana (Decayed)", "🍌"),
-    "snail": ("Banana (Decayed)", "🍌"),
-    "spindle": ("Banana (Decayed)", "🍌"),
-    "wooden_spoon": ("Banana (Decayed)", "🍌"),
-    "mushroom": ("Fruit (Decayed)", "🍎"),
-    "acorn": ("Apple (Decayed)", "🍎"),
-    "sponge": ("Orange (Decayed)", "🍊"),
-    "rock": ("Fruit (Decayed)", "🍎"),
-    "stone": ("Fruit (Decayed)", "🍎"),
-    "dough": ("Fruit (Decayed)", "🍊"),
-    "potato": ("Fruit (Decayed)", "🍎"),
-}
-
-# Explicit non-fruit categories that should be blocked:
+# Explicit non-produce categories that should be blocked
 EXPLICIT_NON_FRUITS = [
     "jean", "suit", "jersey", "t-shirt", "shirt", "dress", "sunglasses", "person", "groom",
     "lab_coat", "cardigan", "sweatshirt", "car", "truck", "airplane", "boat", "motorcycle",
@@ -664,8 +611,8 @@ EXPLICIT_NON_FRUITS = [
 
 def analyze_image_contents(img: Image.Image):
     """
-    Intelligently determines whether the image contains a fruit (fresh or rotten)
-    or an invalid non-fruit object.
+    Validates produce and identifies whether the fruit belongs to the 3 trained classes
+    (Apple, Banana, Orange) or general Fruit.
     Returns: (is_valid, fruit_display, emoji, confidence, detected_raw)
     """
     from tensorflow.keras.applications.mobilenet_v2 import preprocess_input, decode_predictions
@@ -682,27 +629,43 @@ def analyze_image_contents(img: Image.Image):
         top1_conf = round(float(top5[0][2]) * 100.0, 1)
         top1_display = top5[0][1].replace("_", " ").title()
 
-        # 1. Check for explicit non-fruit items
+        # 1. Validation Check: Block explicit non-fruit items
         for non_item in EXPLICIT_NON_FRUITS:
             if non_item in top1_name:
                 return False, top1_display, "🚫", top1_conf, top1_display
 
-        # 2. Check for direct fruit matches in top-5
-        for _, label, conf in top5:
-            clean_label = label.lower().replace(" ", "_")
-            for k, (name, emoji) in DIRECT_FRUITS.items():
-                if k in clean_label:
-                    return True, name, emoji, round(float(conf) * 100.0, 1), label.replace("_", " ").title()
+        # 2. Check Top-1 against the 3 Core Trained Classes
+        for kw in CORE_APPLES:
+            if kw in top1_name:
+                return True, "Apple", "🍎", top1_conf, top1_display
 
-        # 3. Check for rotten/decayed fruit shape proxies
-        for k, (name, emoji) in ROTTEN_SHAPE_PROXIES.items():
-            if k in top1_name:
-                return True, name, emoji, top1_conf, top1_display
+        for kw in CORE_BANANAS:
+            if kw in top1_name:
+                return True, "Banana", "🍌", top1_conf, top1_display
 
-        # 4. If top-1 is not on the explicit non-fruit list, treat as general produce
-        return True, "Fruits", "🍎", top1_conf, top1_display
+        for kw in CORE_ORANGES:
+            if kw in top1_name:
+                return True, "Orange", "🍊", top1_conf, top1_display
 
-    return True, "Fruits", "🍎", 95.0, "Fruits"
+        # 3. Check Top-3 for strong core matches (confidence >= 30%)
+        for _, label, conf in top5[:3]:
+            clean = label.lower().replace(" ", "_")
+            c_pct = round(float(conf) * 100.0, 1)
+            if c_pct >= 30.0:
+                for kw in CORE_APPLES:
+                    if kw in clean:
+                        return True, "Apple", "🍎", c_pct, label.replace("_", " ").title()
+                for kw in CORE_BANANAS:
+                    if kw in clean:
+                        return True, "Banana", "🍌", c_pct, label.replace("_", " ").title()
+                for kw in CORE_ORANGES:
+                    if kw in clean:
+                        return True, "Orange", "🍊", c_pct, label.replace("_", " ").title()
+
+        # 4. Other produce (Grapes, Berries, Melons, Produce) -> Show as 'Fruit'
+        return True, "Fruit", "🍏", top1_conf, top1_display
+
+    return True, "Fruit", "🍏", 95.0, "Fruit"
 
 def predict_freshness(img: Image.Image, auto_center_crop: bool = False):
     """Predict Fresh vs Rotten using the custom CNN."""
@@ -876,7 +839,7 @@ if uploaded_file is not None:
         else:
             # Determine active fruit name (auto-detected or manually switched)
             active_fruit_name = st.session_state.manual_fruit_override if st.session_state.manual_fruit_override else auto_name
-            active_emoji = "🍌" if "Banana" in active_fruit_name else ("🍊" if "Orange" in active_fruit_name else "🍎")
+            active_emoji = "🍌" if active_fruit_name == "Banana" else ("🍊" if active_fruit_name == "Orange" else ("🍎" if active_fruit_name == "Apple" else "🍏"))
 
             # 2. Freshness Prediction (Runs for all validated fruits!)
             if freshness_model is not None:
@@ -913,12 +876,19 @@ if uploaded_file is not None:
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Explanation bubble
-                explanation = (
-                    f"The AI recognized these fruits as <strong>{active_fruit_name}</strong> and detected clear, healthy surface pigmentation indicating they are <strong>Fresh</strong>."
-                    if is_fresh else
-                    f"The AI recognized these fruits as <strong>{active_fruit_name}</strong> and detected surface degradation or discoloration indicating they are <strong>Rotten</strong>."
-                )
+                # Dynamic Explanation bubble
+                if active_fruit_name in ["Apple", "Banana", "Orange"]:
+                    explanation = (
+                        f"The AI recognized these fruits as <strong>{active_fruit_name}</strong> and detected clear, healthy surface pigmentation indicating they are <strong>Fresh</strong>."
+                        if is_fresh else
+                        f"The AI recognized these fruits as <strong>{active_fruit_name}</strong> and detected surface degradation or discoloration indicating they are <strong>Rotten</strong>."
+                    )
+                else:
+                    explanation = (
+                        f"The AI evaluated this <strong>Fruit</strong> and detected clear, healthy surface pigmentation indicating it is <strong>Fresh</strong>."
+                        if is_fresh else
+                        f"The AI evaluated this <strong>Fruit</strong> and detected surface degradation or discoloration indicating it is <strong>Rotten</strong>."
+                    )
                 
                 st.markdown(f"""
                 <div class="fc-info-bubble">
