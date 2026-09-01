@@ -2,13 +2,8 @@
 __pycache__/
 *.pyc
 *.pyo
-*.pyd
 .Python
-*.egg
 *.egg-info/
-dist/
-build/
-.eggs/
 
 # Virtual environments
 venv/
@@ -16,31 +11,17 @@ env/
 .env
 .venv/
 
-# Jupyter
+# Jupyter checkpoints
 .ipynb_checkpoints/
-*.ipynb_checkpoints
-
-# Node.js / Frontend
-node_modules/
-frontend/dist/
-frontend/.env
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Model files — too large for GitHub (508 MB each)
-# Download instructions in README.md → "How to Run Locally" section
-# Use the training notebook (CNN.ipynb) to regenerate the models
-*.keras
-*.h5
-
 # Logs
 *.log
-logs/
+
+# Model files — too large for GitHub (508 MB each)
+# Run CNN.ipynb to regenerate, or use download_model.py
+*.keras
+*.h5

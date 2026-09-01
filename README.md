@@ -311,27 +311,12 @@ Raw Image (any size, any format)
 ```
 FruitsCheck-CNN-Fruit-Freshness/
 │
-├── CNN.ipynb                        # 📓 Main training notebook
-│
-├── backend/                         # 🔧 FastAPI inference server
-│   ├── main.py                      #    REST API with singleton model loading
-│   ├── requirements.txt             #    Python dependencies
-│   ├── Dockerfile                   #    Container for Hugging Face Spaces
-│   └── README.md                    #    HF Spaces config card
-│
-├── frontend/                        # 🖥️ React + Vite web app
-│   ├── src/
-│   │   ├── App.jsx                  #    Main UI component
-│   │   ├── main.jsx                 #    React entrypoint
-│   │   └── styles.css               #    CV-aesthetic design system
-│   ├── index.html
-│   ├── package.json
-│   ├── vite.config.js
-│   ├── netlify.toml                 #    Netlify SPA config
-│   └── .env.example                 #    VITE_API_URL template
-│
-├── DEPLOYMENT.md                    # 🚀 Step-by-step deployment guide
-└── README.md                        # 📖 This file
+├── app.py               # 🖥️  Streamlit app (UI + CNN inference — all-in-one)
+├── requirements.txt     # 📦  Python dependencies for Streamlit Cloud
+├── CNN.ipynb            # 📓  Full training notebook
+├── download_model.py    # 🔧  Helper to re-download Kaggle dataset
+├── DEPLOYMENT.md        # 🚀  Step-by-step deployment guide
+└── README.md            # 📖  This file
 ```
 
 ---
@@ -339,7 +324,7 @@ FruitsCheck-CNN-Fruit-Freshness/
 ## ⚙️ How to Run Locally
 
 ### Prerequisites
-- Python 3.10+ 
+- Python 3.10+
 - TensorFlow 2.15+
 - Jupyter Notebook / Jupyter Lab
 
@@ -351,28 +336,21 @@ cd FruitsCheck-CNN-Fruit-Freshness
 
 ### 2. Install dependencies
 ```bash
-pip install tensorflow numpy pillow jupyter kagglehub
-```
-
-### 3. Open the training notebook
-```bash
-jupyter notebook CNN.ipynb
-```
-
-The notebook will:
-1. Download the dataset from Kaggle via `kagglehub`
-2. Build and preprocess the dataset pipelines
-3. Apply data augmentation
-4. Train the CNN with early stopping
-5. Evaluate on the test set
-6. Save the model as `fruits_classification.keras`
-
-### 4. Run inference (FastAPI backend)
-```bash
-cd backend
 pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-# API docs: http://localhost:8000/docs
+```
+
+### 3. Train the model (first time)
+```bash
+# Download dataset from Kaggle and train
+jupyter notebook CNN.ipynb
+# Run all cells — saves fruits_classification.keras
+```
+
+### 4. Run the Streamlit app
+```bash
+# Place fruits_classification.keras in the project root, then:
+streamlit run app.py
+# → Open http://localhost:8501
 ```
 
 ---
@@ -429,12 +407,8 @@ uvicorn main:app --reload --port 8000
 | Model API | Keras | 3.15.1 |
 | Numerical Computing | NumPy | 2.5.1 |
 | Image Processing | Pillow | 12.3.0 |
-| Data Science | scikit-learn | 1.9.0 |
-| Backend API | FastAPI | 0.139.2 |
-| API Server | Uvicorn | 0.51.0 |
-| Frontend | React 18 + Vite | — |
-| Deployment (Backend) | Hugging Face Spaces | Docker |
-| Deployment (Frontend) | Netlify | — |
+| Web App | Streamlit | 1.59.2 |
+| Deployment | Streamlit Community Cloud | Free |
 
 ---
 
