@@ -1,5 +1,6 @@
 import io
 import os
+import time
 import base64
 import streamlit as st
 import numpy as np
@@ -213,6 +214,100 @@ html, body, [data-testid="stAppViewContainer"] {
     margin-top: 0.25rem !important;
 }
 
+/* === GLOWING LASER SCANNER CONTAINER === */
+.fc-laser-box {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #0B0E0D;
+    border: 1.5px solid #2D3748;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: 380px;
+    width: 100%;
+}
+.fc-laser-img {
+    width: 100%;
+    max-height: 380px;
+    object-fit: contain;
+    display: block;
+}
+.fc-laser-scanner-active {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 3.5px;
+    background: linear-gradient(90deg, transparent 0%, #10B981 30%, #34D399 50%, #10B981 70%, transparent 100%);
+    box-shadow: 0 0 16px 3px #10B981, 0 0 30px #34D399;
+    animation: laser-sweep 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+    pointer-events: none;
+}
+.fc-laser-grid {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+.fc-laser-pill {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: rgba(0,0,0,0.75);
+    border: 1px solid #10B981;
+    border-radius: 9999px;
+    padding: 0.25rem 0.65rem;
+    letter-spacing: 0.06em;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.fc-laser-pill-complete {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #ECFDF5;
+    background: rgba(4, 120, 87, 0.85);
+    border: 1px solid #34D399;
+    border-radius: 9999px;
+    padding: 0.25rem 0.65rem;
+    letter-spacing: 0.06em;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.fc-laser-pill-dot {
+    width: 5px;
+    height: 5px;
+    background: #10B981;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #10B981;
+}
+
+@keyframes laser-sweep {
+    0% {
+        top: 2%;
+        opacity: 0.95;
+    }
+    100% {
+        top: 96%;
+        opacity: 0.95;
+    }
+}
+
 /* === DUAL RECOGNITION + FRESHNESS RESULT === */
 .fc-res-container {
     display: grid;
@@ -331,88 +426,38 @@ html, body, [data-testid="stAppViewContainer"] {
     margin-top: 0.5rem;
 }
 
-/* Quick Override Switcher */
-.fc-override-row {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 0.5rem;
+/* Tech Specs */
+.fc-tech-wrap {
+    background: #FFFFFF;
+    border: 1px solid #E5E2D9;
+    border-radius: 18px;
+    padding: 1.25rem;
+    margin-top: 1.25rem;
 }
-
-/* === GLOWING LASER SCANNER CONTAINER === */
-.fc-laser-box {
-    position: relative;
-    border-radius: 16px;
-    overflow: hidden;
-    background: #0B0E0D;
-    border: 1.5px solid #2D3748;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-height: 380px;
-    width: 100%;
+.fc-tech-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    margin-top: 0.75rem;
 }
-.fc-laser-img {
-    width: 100%;
-    max-height: 380px;
-    object-fit: contain;
-    display: block;
+.fc-tech-item {
+    background: #F8F7F4;
+    border: 1px solid #E5E2D9;
+    border-radius: 8px;
+    padding: 0.65rem 0.75rem;
 }
-.fc-laser-scanner {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 3.5px;
-    background: linear-gradient(90deg, transparent 0%, #10B981 30%, #34D399 50%, #10B981 70%, transparent 100%);
-    box-shadow: 0 0 16px 3px #10B981, 0 0 30px #34D399;
-    animation: laser-sweep 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
-    pointer-events: none;
-}
-.fc-laser-grid {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
-    background-size: 20px 20px;
-    pointer-events: none;
-}
-.fc-laser-pill {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
+.fc-tech-k {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.68rem;
+    font-size: 0.62rem;
     font-weight: 700;
-    color: #FFFFFF;
-    background: rgba(0,0,0,0.75);
-    border: 1px solid #10B981;
-    border-radius: 9999px;
-    padding: 0.25rem 0.65rem;
-    letter-spacing: 0.06em;
-    pointer-events: none;
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
+    color: #8B948C;
+    text-transform: uppercase;
 }
-.fc-laser-pill-dot {
-    width: 5px;
-    height: 5px;
-    background: #10B981;
-    border-radius: 50%;
-    box-shadow: 0 0 6px #10B981;
-}
-
-@keyframes laser-sweep {
-    0% {
-        top: 2%;
-        opacity: 0.95;
-    }
-    100% {
-        top: 96%;
-        opacity: 0.95;
-    }
+.fc-tech-v {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1A1C1A;
+    margin-top: 0.1rem;
 }
 
 @media (max-width: 600px) {
@@ -447,6 +492,16 @@ def load_all_models():
                 break
             except Exception:
                 continue
+
+    # Automatic Cloud Download Fallback for Streamlit Cloud
+    if freshness_model is None:
+        try:
+            from huggingface_hub import hf_hub_download
+            repo_id = os.getenv("HF_MODEL_REPO", "Raj1908/fruitcheck-model")
+            downloaded = hf_hub_download(repo_id=repo_id, filename="fruits_classification.keras")
+            freshness_model = tf.keras.models.load_model(downloaded)
+        except Exception:
+            pass
 
     try:
         fruit_identifier = MobileNetV2(weights="imagenet")
@@ -527,7 +582,7 @@ def analyze_image_contents(img: Image.Image):
         top1_conf = round(float(top5[0][2]) * 100.0, 1)
         top1_display = top5[0][1].replace("_", " ").title()
 
-        # 1. Check for explicit non-fruit items (e.g. human clothing, vehicles, electronics)
+        # 1. Check for explicit non-fruit items
         for non_item in EXPLICIT_NON_FRUITS:
             if non_item in top1_name:
                 return False, top1_display, "🚫", top1_conf, top1_display
@@ -544,10 +599,10 @@ def analyze_image_contents(img: Image.Image):
             if k in top1_name:
                 return True, name, emoji, top1_conf, top1_display
 
-        # 4. If top-1 is not on the explicit non-fruit list, treat as general fruit object
-        return True, "Fruit", "🍎", top1_conf, top1_display
+        # 4. If top-1 is not on the explicit non-fruit list, treat as general produce
+        return True, "Fruits", "🍎", top1_conf, top1_display
 
-    return True, "Fruit", "🍎", 95.0, "Fruit"
+    return True, "Fruits", "🍎", 95.0, "Fruits"
 
 def predict_freshness(img: Image.Image, auto_center_crop: bool = False):
     """Predict Fresh vs Rotten using the custom CNN."""
@@ -582,7 +637,13 @@ def predict_freshness(img: Image.Image, auto_center_crop: bool = False):
     return label, confidence, raw, fresh_prob, rotten_prob
 
 # ─── Top Navbar ───────────────────────────────────────────────────────────────
-st.markdown("""
+model_badge = (
+    '<span class="fc-dot"></span> MODEL ONLINE'
+    if freshness_model is not None else
+    '<span style="color:#DC2626;">● MODEL OFFLINE</span>'
+)
+
+st.markdown(f"""
 <div class="fc-nav">
   <div class="fc-nav-left">
     <span class="fc-logo">🍏</span>
@@ -592,7 +653,7 @@ st.markdown("""
     </div>
   </div>
   <div class="fc-badge-online">
-    <span class="fc-dot"></span> MODEL ONLINE
+    {model_badge}
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -638,21 +699,20 @@ if uploaded_file is not None:
         pil_image.save(b64_buffer, format="JPEG")
         img_b64_str = base64.b64encode(b64_buffer.getvalue()).decode("utf-8")
         
-        # Display image preview with Glowing Laser Scanner Animation
+        # Display image preview with completed scanner badge (laser line stops once result is ready)
         img_col, opt_col = st.columns([1.3, 1])
         
         with img_col:
             st.markdown(f"""
             <div class="fc-laser-box">
               <img src="data:image/jpeg;base64,{img_b64_str}" class="fc-laser-img" alt="Uploaded Image" />
-              <div class="fc-laser-scanner"></div>
               <div class="fc-laser-grid"></div>
-              <div class="fc-laser-pill">
-                <span class="fc-laser-pill-dot"></span> CNN SCAN ACTIVE
+              <div class="fc-laser-pill-complete">
+                <span>✓</span> SCAN COMPLETE
               </div>
             </div>
             <div style="font-size: 0.75rem; color: #8B948C; text-align: center; margin-top: 0.35rem;">
-              Scanning visual surface patterns in real-time
+              Surface patterns analyzed successfully
             </div>
             """, unsafe_allow_html=True)
             
@@ -771,7 +831,15 @@ if uploaded_file is not None:
                             st.rerun()
 
             else:
-                st.error("Freshness CNN model not found in memory.")
+                st.markdown("""
+                <div style="background: #FFFBEB; border: 1.5px solid #FCD34D; border-radius: 14px; padding: 1.25rem; margin-top: 1rem;">
+                  <div style="font-weight: 700; color: #92400E; margin-bottom: 0.35rem;">📦 Model Download Required on Cloud</div>
+                  <div style="font-size: 0.85rem; color: #B45309; line-height: 1.45;">
+                    The 508MB model weights are stored on Hugging Face Model Hub.
+                    To enable online inference, set <code>HF_MODEL_REPO = "Raj1908/fruitcheck-model"</code> in your Streamlit Cloud app secrets.
+                  </div>
+                </div>
+                """, unsafe_allow_html=True)
                 
     except Exception as err:
         st.error(f"Error processing image: {err}")
