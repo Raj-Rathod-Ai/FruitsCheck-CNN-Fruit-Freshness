@@ -1,5 +1,6 @@
 import io
 import os
+import base64
 import streamlit as st
 import numpy as np
 from PIL import Image
@@ -338,38 +339,80 @@ html, body, [data-testid="stAppViewContainer"] {
     margin-top: 0.5rem;
 }
 
-/* Tech Specs */
-.fc-tech-wrap {
-    background: #FFFFFF;
-    border: 1px solid #E5E2D9;
-    border-radius: 18px;
-    padding: 1.25rem;
-    margin-top: 1.25rem;
+/* === GLOWING LASER SCANNER CONTAINER === */
+.fc-laser-box {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #0B0E0D;
+    border: 1.5px solid #2D3748;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: 380px;
+    width: 100%;
 }
-.fc-tech-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.6rem;
-    margin-top: 0.75rem;
+.fc-laser-img {
+    width: 100%;
+    max-height: 380px;
+    object-fit: contain;
+    display: block;
 }
-.fc-tech-item {
-    background: #F8F7F4;
-    border: 1px solid #E5E2D9;
-    border-radius: 8px;
-    padding: 0.65rem 0.75rem;
+.fc-laser-scanner {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 3.5px;
+    background: linear-gradient(90deg, transparent 0%, #10B981 30%, #34D399 50%, #10B981 70%, transparent 100%);
+    box-shadow: 0 0 16px 3px #10B981, 0 0 30px #34D399;
+    animation: laser-sweep 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+    pointer-events: none;
 }
-.fc-tech-k {
+.fc-laser-grid {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+.fc-laser-pill {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.62rem;
+    font-size: 0.68rem;
     font-weight: 700;
-    color: #8B948C;
-    text-transform: uppercase;
+    color: #FFFFFF;
+    background: rgba(0,0,0,0.75);
+    border: 1px solid #10B981;
+    border-radius: 9999px;
+    padding: 0.25rem 0.65rem;
+    letter-spacing: 0.06em;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
 }
-.fc-tech-v {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #1A1C1A;
-    margin-top: 0.1rem;
+.fc-laser-pill-dot {
+    width: 5px;
+    height: 5px;
+    background: #10B981;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #10B981;
+}
+
+@keyframes laser-sweep {
+    0% {
+        top: 2%;
+        opacity: 0.95;
+    }
+    100% {
+        top: 96%;
+        opacity: 0.95;
+    }
 }
 
 @media (max-width: 600px) {
@@ -590,11 +633,28 @@ if uploaded_file is not None:
         raw_bytes = uploaded_file.read()
         pil_image = Image.open(io.BytesIO(raw_bytes))
         
-        # Display image preview
+        # Convert image to base64 for laser scanner rendering
+        b64_buffer = io.BytesIO()
+        pil_image.save(b64_buffer, format="JPEG")
+        img_b64_str = base64.b64encode(b64_buffer.getvalue()).decode("utf-8")
+        
+        # Display image preview with Glowing Laser Scanner Animation
         img_col, opt_col = st.columns([1.3, 1])
         
         with img_col:
-            st.image(pil_image, caption=f"Uploaded: {uploaded_file.name}", use_container_width=True)
+            st.markdown(f"""
+            <div class="fc-laser-box">
+              <img src="data:image/jpeg;base64,{img_b64_str}" class="fc-laser-img" alt="Uploaded Image" />
+              <div class="fc-laser-scanner"></div>
+              <div class="fc-laser-grid"></div>
+              <div class="fc-laser-pill">
+                <span class="fc-laser-pill-dot"></span> CNN SCAN ACTIVE
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: #8B948C; text-align: center; margin-top: 0.35rem;">
+              Scanning visual surface patterns in real-time
+            </div>
+            """, unsafe_allow_html=True)
             
         with opt_col:
             st.markdown(f"**Dimensions:** `{pil_image.width} × {pil_image.height}`")
@@ -644,12 +704,12 @@ if uploaded_file is not None:
                 fill_class = "fc-meter-fill-fresh" if is_fresh else "fc-meter-fill-rotten"
                 icon = "🟢" if is_fresh else "🔴"
                 
-                # Dual Result Cards: Detected Fruit + Freshness Assessment
+                # Dual Result Cards: Detected Fruits + Freshness Assessment
                 st.markdown(f"""
                 <div class="fc-res-container">
                   <!-- Box 1: Auto-Detected Fruit Name -->
                   <div class="fc-box">
-                    <div class="fc-box-label">DETECTED FRUIT</div>
+                    <div class="fc-box-label">DETECTED FRUITS</div>
                     <div class="fc-fruit-detected">{active_emoji} {active_fruit_name}</div>
                     <div class="fc-fruit-conf">Recognition: <strong>{auto_conf}%</strong> &bull; Auto-Identified</div>
                   </div>
@@ -668,9 +728,9 @@ if uploaded_file is not None:
                 
                 # Explanation bubble
                 explanation = (
-                    f"The AI recognized this image as <strong>{active_fruit_name}</strong> and detected clear, healthy surface pigmentation indicating it is <strong>Fresh</strong>."
+                    f"The AI recognized these fruits as <strong>{active_fruit_name}</strong> and detected clear, healthy surface pigmentation indicating they are <strong>Fresh</strong>."
                     if is_fresh else
-                    f"The AI recognized this image as <strong>{active_fruit_name}</strong> and detected surface degradation or discoloration indicating it is <strong>Rotten</strong>."
+                    f"The AI recognized these fruits as <strong>{active_fruit_name}</strong> and detected surface degradation or discoloration indicating they are <strong>Rotten</strong>."
                 )
                 
                 st.markdown(f"""
