@@ -25,3 +25,8 @@ Thumbs.db
 # Run CNN.ipynb to regenerate, or use download_model.py
 *.keras
 *.h5
+
+# Showcase videos
+*.mp4
+showcase_videos/
+
