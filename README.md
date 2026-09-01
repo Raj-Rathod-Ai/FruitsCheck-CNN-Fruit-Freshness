@@ -2,17 +2,18 @@
 
 <div align="center">
 
-![FruitCheck Banner](https://img.shields.io/badge/FruitCheck-CNN%20Fruit%20Freshness%20Classifier-brightgreen?style=for-the-badge&logo=tensorflow)
+[![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-fruits--check.streamlit.app-FF4B4B?style=for-the-badge&logo=streamlit)](https://fruits-check.streamlit.app/)
 
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.21.0-FF6F00?style=flat-square&logo=tensorflow)](https://tensorflow.org)
-[![Keras](https://img.shields.io/badge/Keras-3.15.1-D00000?style=flat-square&logo=keras)](https://keras.io)
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python)](https://python.org)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-Live%20App-FF4B4B?style=flat-square&logo=streamlit)](https://fruits-check.streamlit.app/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-FF6F00?style=flat-square&logo=tensorflow)](https://tensorflow.org)
+[![Keras](https://img.shields.io/badge/Keras-3.x-D00000?style=flat-square&logo=keras)](https://keras.io)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python)](https://python.org)
 [![Dataset](https://img.shields.io/badge/Dataset-Kaggle-20BEFF?style=flat-square&logo=kaggle)](https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification)
 
 **A Convolutional Neural Network trained to classify fruit images as Fresh or Rotten.**  
 Built from scratch using TensorFlow/Keras, trained on a real-world image dataset with data augmentation, achieving **96.79% validation accuracy** and **96.33% test accuracy**.
 
-[View Notebook](#-notebook-walkthrough) • [Model Architecture](#-model-architecture) • [Training Results](#-training-results) • [How to Run](#-how-to-run-locally)
+[🚀 **Try Live Demo**](https://fruits-check.streamlit.app/) • [View Notebook](#-notebook-walkthrough) • [Model Architecture](#-model-architecture) • [Training Results](#-training-results) • [How to Run](#-how-to-run-locally)
 
 </div>
 
