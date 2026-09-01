@@ -598,18 +598,34 @@ freshness_model, fruit_identifier = load_all_models()
 
 # ─── Intelligent Validation & Recognition Engine ──────────────────────────────
 DIRECT_FRUITS = {
-    "banana": ("Banana", "🍌"),
+    # Apples (Red Delicious, Gala, Granny Smith, and shape/color proxies)
     "apple": ("Apple", "🍎"),
     "granny_smith": ("Apple", "🍏"),
+    "pomegranate": ("Apple", "🍎"),
+    "custard_apple": ("Apple", "🍏"),
+    "crab_apple": ("Apple", "🍎"),
+    "wood_apple": ("Apple", "🍏"),
+    "quince": ("Apple", "🍎"),
+    "rose_hip": ("Apple", "🍎"),
+    "plum": ("Apple", "🍎"),
+    "nectarine": ("Apple", "🍎"),
+    
+    # Bananas
+    "banana": ("Banana", "🍌"),
+    "plantain": ("Banana", "🍌"),
+    
+    # Oranges & Citrus
     "orange": ("Orange", "🍊"),
-    "lemon": ("Lemon", "🍋"),
-    "lime": ("Lime", "🍈"),
+    "lemon": ("Orange / Lemon", "🍋"),
+    "lime": ("Orange / Lime", "🍈"),
+    "tangerine": ("Orange", "🍊"),
+    "mandarin": ("Orange", "🍊"),
+    "grapefruit": ("Orange", "🍊"),
+    "citrus": ("Orange", "🍊"),
+    
+    # Other Common Produce
     "strawberry": ("Strawberry", "🍓"),
     "pineapple": ("Pineapple", "🍍"),
-    "pomegranate": ("Pomegranate", "🍎"),
-    "fig": ("Fig", "🫐"),
-    "custard_apple": ("Custard Apple", "🍈"),
-    "jackfruit": ("Jackfruit", "🍈"),
     "papaya": ("Papaya", "🥭"),
     "mango": ("Mango", "🥭"),
     "grape": ("Grapes", "🍇"),
