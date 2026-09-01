@@ -460,6 +460,84 @@ html, body, [data-testid="stAppViewContainer"] {
     margin-top: 0.1rem;
 }
 
+/* === STREAMLIT EXPANDER, CODE, BUTTONS & CHECKBOX THEME OVERRIDES === */
+code {
+    background: #EFECE4 !important;
+    color: #1A1C1A !important;
+    border: 1px solid #DCD8CD !important;
+    padding: 0.15rem 0.45rem !important;
+    border-radius: 6px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 700 !important;
+    font-size: 0.85em !important;
+}
+
+[data-testid="stExpander"] {
+    background: #FFFFFF !important;
+    border: 1px solid #E5E2D9 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+    margin-top: 1rem !important;
+    overflow: hidden !important;
+}
+[data-testid="stExpander"] details {
+    background: #FFFFFF !important;
+    border-radius: 14px !important;
+}
+[data-testid="stExpander"] summary {
+    background: #FFFFFF !important;
+    color: #1A1C1A !important;
+    font-weight: 700 !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 14px !important;
+}
+[data-testid="stExpander"] summary:hover {
+    background: #F8F7F4 !important;
+    color: #000000 !important;
+}
+[data-testid="stExpander"] summary svg, [data-testid="stExpander"] summary span {
+    color: #1A1C1A !important;
+    fill: #1A1C1A !important;
+}
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+    background: #FFFFFF !important;
+    color: #1A1C1A !important;
+    padding: 1rem !important;
+    border-top: 1px solid #F1EFE9 !important;
+}
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] p,
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] li,
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] span {
+    color: #1A1C1A !important;
+}
+
+/* Fix Streamlit Buttons & Switcher */
+.stButton > button {
+    background: #FFFFFF !important;
+    color: #1A1C1A !important;
+    border: 1.5px solid #DCD8CD !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    transition: all 0.15s ease !important;
+}
+.stButton > button:hover {
+    background: #F4F2EB !important;
+    border-color: #1A1C1A !important;
+    color: #000000 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
+}
+
+/* Fix Checkbox & Label Colors */
+[data-testid="stCheckbox"] label {
+    color: #1A1C1A !important;
+    font-weight: 600 !important;
+}
+[data-testid="stCheckbox"] span {
+    color: #1A1C1A !important;
+}
+
 @media (max-width: 600px) {
     .fc-res-container { grid-template-columns: 1fr; }
     .fc-tech-grid { grid-template-columns: 1fr; }
