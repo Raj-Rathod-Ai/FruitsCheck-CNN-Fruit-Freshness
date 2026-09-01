@@ -1,6 +1,7 @@
 import io
 import os
 import time
+import random
 import base64
 import streamlit as st
 import numpy as np
@@ -782,22 +783,49 @@ if uploaded_file is not None:
         pil_image.save(b64_buffer, format="JPEG")
         img_b64_str = base64.b64encode(b64_buffer.getvalue()).decode("utf-8")
         
-        # Display image preview with completed scanner badge (laser line stops once result is ready)
+        # Check if this is a newly uploaded image that needs scanning
+        img_key = f"{uploaded_file.name}_{uploaded_file.size}"
+        
+        # Display image preview container
         img_col, opt_col = st.columns([1.3, 1])
         
-        with img_col:
-            st.markdown(f"""
+        scan_box = img_col.empty()
+        status_box = img_col.empty()
+        
+        if st.session_state.get("last_scanned_img") != img_key:
+            # 1. Show LIVE sweeping green laser scanning animation during random delay (3 to 7 seconds)
+            scan_box.markdown(f"""
             <div class="fc-laser-box">
-              <img src="data:image/jpeg;base64,{img_b64_str}" class="fc-laser-img" alt="Uploaded Image" />
+              <img src="data:image/jpeg;base64,{img_b64_str}" class="fc-laser-img" alt="Scanning Image" />
+              <div class="fc-laser-scanner-active"></div>
               <div class="fc-laser-grid"></div>
-              <div class="fc-laser-pill-complete">
-                <span>✓</span> SCAN COMPLETE
+              <div class="fc-laser-pill">
+                <span class="fc-laser-pill-dot"></span> CNN SCANNING SURFACE...
               </div>
             </div>
-            <div style="font-size: 0.75rem; color: #8B948C; text-align: center; margin-top: 0.35rem;">
-              Surface patterns analyzed successfully
-            </div>
             """, unsafe_allow_html=True)
+            
+            scan_delay = random.uniform(3.0, 7.0)
+            steps = 20
+            dt = scan_delay / steps
+            for i in range(steps):
+                time.sleep(dt)
+                pct = int((i + 1) / steps * 100)
+                status_box.markdown(f"<div style='font-size:0.75rem; color:#059669; text-align:center; margin-top:0.35rem; font-family:\"JetBrains Mono\", monospace;'>⚡ Neural scanning surface patterns... {pct}%</div>", unsafe_allow_html=True)
+                
+            st.session_state.last_scanned_img = img_key
+            
+        # 2. Once scan is complete, display the final static complete scanner box (laser stops)
+        scan_box.markdown(f"""
+        <div class="fc-laser-box">
+          <img src="data:image/jpeg;base64,{img_b64_str}" class="fc-laser-img" alt="Uploaded Image" />
+          <div class="fc-laser-grid"></div>
+          <div class="fc-laser-pill-complete">
+            <span>✓</span> SCAN COMPLETE
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+        status_box.markdown("<div style='font-size:0.75rem; color:#8B948C; text-align:center; margin-top:0.35rem;'>Surface patterns analyzed successfully</div>", unsafe_allow_html=True)
             
         with opt_col:
             st.markdown(f"**Dimensions:** `{pil_image.width} × {pil_image.height}`")
