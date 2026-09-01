@@ -1,5 +1,5 @@
-streamlit>=1.39.0
-tensorflow>=2.15.0
-numpy>=1.26.0
+streamlit>=1.35.0
+tensorflow>=2.15.0,<=2.17.1
+numpy>=1.24.0,<2.0.0
 pillow>=10.0.0
 huggingface_hub>=0.24.0

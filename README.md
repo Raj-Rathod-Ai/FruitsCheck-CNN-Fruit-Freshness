@@ -8,7 +8,6 @@
 [![Keras](https://img.shields.io/badge/Keras-3.15.1-D00000?style=flat-square&logo=keras)](https://keras.io)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python)](https://python.org)
 [![Dataset](https://img.shields.io/badge/Dataset-Kaggle-20BEFF?style=flat-square&logo=kaggle)](https://www.kaggle.com/datasets/sriramr/fruits-fresh-and-rotten-for-classification)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 **A Convolutional Neural Network trained to classify fruit images as Fresh or Rotten.**  
 Built from scratch using TensorFlow/Keras, trained on a real-world image dataset with data augmentation, achieving **96.79% validation accuracy** and **96.33% test accuracy**.
@@ -438,11 +437,7 @@ GitHub: [@Raj-Rathod-Ai](https://github.com/Raj-Rathod-Ai)
 
 ---
 
-## 📄 License
 
-This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
-
----
 
 <div align="center">
 
